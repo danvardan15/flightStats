@@ -2,7 +2,7 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 library(tools)
-library(chron)
+library(DT)
 
 flights <- read.csv("/home/danielv/Documents/bccn/R_tut/DATA/flights_creation.csv",
                  header = TRUE, stringsAsFactors = FALSE)
@@ -65,7 +65,12 @@ ui <- fluidPage(
     
     # Output(s)
     mainPanel(
-      plotOutput(outputId = "scatterplot")
+      plotOutput(outputId = "scatterplot", brush = "plot_brush"),
+      dataTableOutput(outputId = "flightstable"),
+      br(),
+      plotOutput(outputId = "densityplot")
+      
+      
     )
   )
 
@@ -86,6 +91,22 @@ server <- function(input, output) {
            aes_string(x = input$x, y = input$y, color = input$z,
                       size = "arrival_delay")) +
       geom_point()
+  })
+  
+  # Create  density object the plotOutput function is expecting
+  output$densityplot <- renderPlot({
+    ggplot(data = flights_subset(), 
+           aes_string(x = input$x)) +
+      geom_bar()
+  })
+  
+  # Create data table
+  output$flightstable <- DT::renderDataTable({
+    flights_sample <- brushedPoints(flights_subset(), brush = input$plot_brush) %>%
+      select(c('flight_id', 'airline', 'airport', 'scheduled_departure'))
+    DT::datatable(data = flights_sample, 
+                  options = list(pageLength = 10), 
+                  rownames = FALSE)
   })
   
   
