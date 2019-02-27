@@ -65,6 +65,8 @@ ui <- fluidPage(
     
     # Output(s)
     mainPanel(
+      HTML(paste("<h2>Stats comparison:</h2>")),
+      htmlOutput(outputId = "corrcoef"),
       plotOutput(outputId = "scatterplot", brush = "plot_brush"),
       dataTableOutput(outputId = "flightstable"),
       br(),
@@ -83,6 +85,20 @@ server <- function(input, output) {
   flights_subset <- reactive({
     req(input$selected_type)
     filter(flights, airline %in% input$selected_type)
+  })
+  
+  # Calculate averages
+  output$corrcoef <- renderUI({
+    
+    r <- round(cor(flights_subset()[, input$x],
+                   as.double(flights_subset()[, input$y]),
+                   use = "pairwise"), 3)
+    HTML(
+      paste(input$x, "v. ", input$y),
+      "\t",
+      paste("<br>Correlation coefficient: ", input$y, "=", r),
+      paste("<h6> Valid for linear dependencies </h6>")
+    )
   })
   
   # Create scatterplot object the plotOutput function is expecting
