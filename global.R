@@ -36,6 +36,9 @@ flightTypes <- c("country" = "countryCode", "airline" = "airline",
 table_vars  <- c("airport", "airline", "price", "date_of_flight")
 table_names <- c("Airport", "Airline", "Price €", "Date of flight")
 
+tableMap_vars  <- c("airport", "price", "date_of_flight")
+tableMap_names <- c("Airport", "Price €", "Date of flight")
+
 
 mapColor_vars <- c("months in advance" = "months_in_advance", "price" = "price",
                    "airline" = "airline", "country" = "countryCode")
@@ -46,9 +49,16 @@ airlines <- unique(flights$airline)
 yearsFlight <- unique(flights$year_of_flight)
 
 # Constant
-maxRadius <-  50000
+maxRadius <-  10
+tol = 1e-4
 
 # Useful functions
+
+#compare floats
+cmpfloat <- function(x, y) {
+  abs(x - y) <= tol
+}
+abs(flights$lat - cx) <= tol
 
 # mode of numerical or categorical
 getmode <- function(v) {

@@ -21,7 +21,9 @@ ui <- fluidPage(
                           selectInput(inputId = "mapColor", 
                                       label = "Color by:",
                                       choices = mapColor_vars,
-                                      selected = "airline")
+                                      selected = "countryCode"),
+                          br(),
+                          dataTableOutput(outputId = "airporttable")
                           
             )
    ),

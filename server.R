@@ -41,12 +41,31 @@ server <- function(input,output, session){
     }
     
     leafletProxy("europeMap", data = map_points()) %>%
-      addCircles(~lng, ~lat,
+      addCircleMarkers(~lng, ~lat,
                  fillOpacity=1, radius = radius,
                  fillColor=pal(colorData), stroke=FALSE,
                  popup = ~ paste(paste0(as.character(price), '€'), airport)) %>%
       addLegend("topright", pal=pal, values=colorData, title=colorBy,
                 layerId="colorLegend")
+  })
+  
+  # event for clicking the map
+  flightAirport <- eventReactive(
+    eventExpr = input$europeMap_marker_click, 
+    valueExpr = {
+      loc <- input$europeMap_marker_click
+      flights_to_airport <- map_points()[cmpfloat(map_points()$lat, loc$lat),]
+      flights_to_airport <- flights_to_airport[cmpfloat(flights_to_airport$lng, loc$lng),]
+      flights_to_airport
+  })
+  
+  # Create data table of flights to this airport
+  output$airporttable <- DT::renderDataTable({
+    flights_sample <- flightAirport() %>%
+      select(tableMap_vars)
+    DT::datatable(data = flights_sample,
+                  colnames = tableMap_names,
+                  width = 200)
   })
   
   # Create scatterplot object the plotOutput function is expecting
