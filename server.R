@@ -17,19 +17,18 @@ server <- function(input,output, session){
   
   # render Map
   output$europeMap <- renderLeaflet({
-    map <- leaflet(data = map_points()) %>%
+    map <- leaflet() %>%
       addProviderTiles("Stamen.Toner") %>%
-      #addProviderTiles("Stamen.Terrain") %>%
       #addProviderTiles("Esri.NatGeoWorldMap") %>%
       setView(lng = 3, lat = 42, zoom = 3.5) #%>%
-      #addCircles(lng = ~ lng, lat= ~ lat, popup = ~ paste(as.character(price), '€'))
     map
   })
   
+  # Handle circles on top of the map
   observe({
     colorBy <- input$mapColor
-    colorData <- flights[[colorBy]]
-    sizeBy <- input$mapSize
+    colorData <- map_points()[[colorBy]]
+    radius <- map_points()[["price"]] / max(map_points()[["price"]]) * maxRadius
     
     if (colorBy == "price") {
       # Continuous values.
@@ -39,19 +38,10 @@ server <- function(input,output, session){
       pal <- colorFactor("viridis", colorData)
     }
     
-    if (sizeBy == "price") {
-      # Continuous
-      radius <- flights[[sizeBy]] / max(flights[[sizeBy]]) * maxRadius
-    } else {
-      # Categorical
-      radius <- ifelse(flights[[sizeBy]] == "True", maxRadius, minRadius)
-    }
-    
-    leafletProxy("europeMap", data = flights) %>%
-      #clearShapes() %>%
+    leafletProxy("europeMap", data = map_points()) %>%
       addCircles(~lng, ~lat,
-                 stroke=FALSE, fillOpacity=0.8, radius = radius,
-                 fillColor=pal(colorData),
+                 fillOpacity=0.8, radius = radius,
+                 fillColor=pal(colorData), stroke=FALSE,
                  popup = ~ paste(paste0(as.character(price), '€'), airport)) %>%
       addLegend("topright", pal=pal, values=colorData, title=colorBy,
                 layerId="colorLegend")
@@ -59,7 +49,23 @@ server <- function(input,output, session){
   
   
   # Calculate statistics
-  # todo
+  # Create regression output
+  output$statsFlights <- renderText({
+    x_data <- flights_subset() %>% pull(input$x)
+    if(is.numeric(x_data)) {
+      avg_x <-  x_data %>% mean() %>% round(2)
+      std_x <- x_data  %>% std() %>% round(2)
+      stat_vals <- c("Mean:", avg_x, "Standard deviation:", std_x)
+    }else{
+      mod_x <- x_data  %>% getmode() %>% getmonth()
+      n_x <-  x_data %>% length()
+      
+      stat_vals <- c("Mode:", mod_x, "Number of data points:", n_x)
+    }
+    string <-  paste("Statistics of", input$x, "\n",
+                stat_vals[1], stat_vals[2], "\n", stat_vals[3], stat_vals[4])
+    string
+  })
   
   # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({

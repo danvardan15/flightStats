@@ -21,13 +21,7 @@ ui <- fluidPage(
                           selectInput(inputId = "mapColor", 
                                       label = "Color by:",
                                       choices = mapColor_vars,
-                                      selected = "airline"),
-                          
-                          # Select variable for size
-                          selectInput(inputId = "mapSize", 
-                                      label = "Size by:",
-                                      choices = mapSize_vars,
-                                      selected = "price")
+                                      selected = "airline")
                           
             )
    ),
@@ -60,7 +54,9 @@ ui <- fluidPage(
         checkboxGroupInput(inputId = "selected_type",
                    label = "Select airline(s):",
                    choices = airlines,
-                   selected = airlines)
+                   selected = airlines),
+        # Regression output
+        verbatimTextOutput(outputId = "statsFlights") 
       ),
     
     # Output(s)

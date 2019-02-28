@@ -13,10 +13,14 @@ flights$month_of_purchase <- month.abb[flights$month_of_purchase]
 flights$month_of_flight <- month.abb[flights$month_of_flight]
 flights$year_of_purchase <- as.character(flights$year_of_purchase)
 flights$year_of_flight <- as.character(flights$year_of_flight)
+flights$date_of_flight <- paste(flights$month_of_flight, flights$year_of_flight)
 
 # store as factor to preserve chronological order
 flights$month_of_purchase = factor(flights$month_of_purchase, levels = month.abb)
 flights$month_of_flight = factor(flights$month_of_flight, levels = month.abb)
+
+#round price
+flights$price = round(flights$price, 2)
 
 # variables
 flightFeatures <- c("month of flight" = "month_of_flight", 
@@ -31,11 +35,18 @@ flightTypes <- c("country" = "countryCode", "airline" = "airline",
 
 airlines <- unique(flights$airline)
 
-table_vars  <- c('airport', 'airline', 'price', 'month_of_flight', 'year_of_flight')
-table_names <- c('Airport', 'Airline', 'Price €', 'Month of flight', 'Year of flight')
+table_vars  <- c('airport', 'airline', 'price', 'date_of_flight')
+table_names <- c('Airport', 'Airline', 'Price €', 'Date of flight')
 
-mapSize_vars <- c('on sale' = 'sale', 'price' = 'price')
-mapColor_vars <- c(sizeColor_vars, 'airline' = 'airline', 'country' = 'countryCode')
+mapColor_vars <- c('price' = 'price', 'airline' = 'airline', 'country' = 'countryCode')
 
 maxRadius <-  50000
-minRadius <-  5000
+
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+getmonth <- function(n) {
+  month.abb[n]
+}
