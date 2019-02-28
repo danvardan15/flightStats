@@ -5,24 +5,28 @@ library(ggplot2)
 library(tools)
 library(DT)
 
-flights <- read.csv("/home/danielv/Documents/bccn/R_tut/DATA/flights_creation.csv",
+flights <- read.csv("/home/danielv/Documents/bccn/R_tut/flight_app/sample.csv",
                     header = TRUE, stringsAsFactors = FALSE)
 
-#add column with hours
-flights$departure_hour = format(strptime(flights$scheduled_departure,
-                                         '%Y-%m-%d %T'), '%H')
+#month from number to string
+flights$month_of_purchase <- month.abb[c(flights$month_of_purchase)]
+flights$month_of_travel <- month.abb[c(flights$month_of_travel)]
+
+flights$month_of_purchase = factor(flights$month_of_purchase, levels = month.abb)
+flights$month_of_travel = factor(flights$month_of_travel, levels = month.abb)
 
 # variables
-airlineChoices <- c("EasyJet" = "U2", "Lufthansa" = "LH",
-                    "Eurowings" = "EW", "Ryanair" = "FR")
+flightFeatures <- c("month of travel" = "month_of_travel", 
+                    "month of purchase" = "month_of_purchase",
+                    "months in advance" = "months_in_advance",
+                    "duration [min]" = "duration", 
+                    "distance [km]" = "dist",
+                    "price [€]" = "price")
 
-flightFeatures <- c("Scheduled departure hour" = "departure_hour", 
-                    "Departure delay" = "departure_delay",
-                    "Arrival delay" = "arrival_delay",
-                    "Estimated duration" = "estimated_duration", 
-                    "Actual duration" = "actual_duration")
+flightTypes <- c("country" = "countryCode", "airline" = "airline", 
+                 "on sale" = "sale", "year of travel" = "year_of_travel")
 
-flightTypes <- c("Country" = "country", "Airline" = "airline", 
-                 "Airport" = "airport", "Estimated duration" = "estimated_duration")
+airlines <- unique(flights$airline)
 
+table_vars <- c('airport', 'airline', 'price', 'month_of_travel', 'year_of_travel')
 

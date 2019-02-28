@@ -25,7 +25,7 @@ server <- function(input,output, session){
   output$scatterplot <- renderPlot({
     ggplot(data = flights_subset(), 
            aes_string(x = input$x, y = input$y, color = input$z,
-                      size = "arrival_delay")) +
+                      size = "price")) +
       geom_point()
   })
   
@@ -39,18 +39,20 @@ server <- function(input,output, session){
   # Create data table
   output$flightstable <- DT::renderDataTable({
     flights_sample <- brushedPoints(flights_subset(), brush = input$plot_brush) %>%
-    select(c('flight_id', 'airline', 'airport'))
+    select(table_vars)
     DT::datatable(data = flights_sample,
                   rownames = FALSE)
   })
   
   # render Map
   output$europeMap <- renderLeaflet({
-    map <- leaflet() %>%
-      addTiles() %>%
-      setView(lng = 5, lat = 42 , zoom = 5)
+    map <- leaflet(data = flights_subset()) %>%
+      #addProviderTiles("Esri.WorldImagery") %>%
+      addProviderTiles("Stamen.Toner") %>%
+      setView(lng = 5, lat = 42, zoom = 5) %>%
+      addCircles(lng = ~ lng, lat= ~ lat, popup = ~ paste(as.character(price), '€'))
     map
-  })  
+  })
   
 
 }

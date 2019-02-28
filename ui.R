@@ -2,7 +2,7 @@ ui <- fluidPage(
   
   navbarPage("STATS_change", id="shinyApp",
    # Sidebar layout with a input and output definitions
-   tabPanel("Flight data",
+   tabPanel("Flights data",
      
       # Inputs(s)
       absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
@@ -12,13 +12,13 @@ ui <- fluidPage(
         selectInput(inputId = "y", 
                     label = "Y-axis:",
                     choices = flightFeatures, 
-                    selected = "Scheduled departure"),
+                    selected = "price"),
         
         # Select variable for x-axis
         selectInput(inputId = "x", 
                     label = "X-axis:",
                     choices = flightFeatures,
-                    selected = "actual_duration"),
+                    selected = "months in advance"),
         
         # Select variable for color
         selectInput(inputId = "z", 
@@ -29,8 +29,8 @@ ui <- fluidPage(
         # Select which airlines to plot
         checkboxGroupInput(inputId = "selected_type",
                    label = "Select airline(s):",
-                   choices = airlineChoices,
-                   selected = c("U2", "FR", "EW")),
+                   choices = airlines,
+                   selected = airlines),
         
         dataTableOutput(outputId = "flightstable")
                     
@@ -39,7 +39,7 @@ ui <- fluidPage(
     # Output(s)
     mainPanel(
       HTML(paste("<h2>Stats comparison:</h2>")),
-      htmlOutput(outputId = "corrcoef"),
+      #htmlOutput(outputId = "corrcoef"),
       plotOutput(outputId = "scatterplot", brush = "plot_brush"),
       br(),
       plotOutput(outputId = "densityplot")
