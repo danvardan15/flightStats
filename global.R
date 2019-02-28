@@ -5,7 +5,7 @@ library(ggplot2)
 library(tools)
 library(DT)
 
-flights <- read.csv("sample.csv",
+flights <- read.csv("data/flights.csv",
                     header = TRUE, stringsAsFactors = FALSE)
 
 #dates from number to string
@@ -49,6 +49,9 @@ airlines <- unique(flights$airline)
 yearsFlight <- unique(flights$year_of_flight)
 
 # Constant
+lat_init = 42
+lng_init = 3
+zoom_init = 3.5
 maxRadius <-  10
 tol = 1e-4
 

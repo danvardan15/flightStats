@@ -17,12 +17,21 @@ server <- function(input,output, session){
     filter(flights, price >= priceFilter[1] & price <= priceFilter[2])
   })
   
+  # event for clicking the map
+  flightAirport <- eventReactive(
+    eventExpr = input$europeMap_marker_click, 
+    valueExpr = {
+      loc <- input$europeMap_marker_click
+      flights_to_airport <- map_points()[cmpfloat(map_points()$lat, loc$lat),]
+      flights_to_airport <- flights_to_airport[cmpfloat(flights_to_airport$lng, loc$lng),]
+      flights_to_airport
+    })
+  
   # render Map
   output$europeMap <- renderLeaflet({
     map <- leaflet() %>%
       addProviderTiles("Stamen.Toner") %>%
-      #addProviderTiles("Esri.NatGeoWorldMap") %>%
-      setView(lng = 3, lat = 42, zoom = 3.5) #%>%
+      setView(lng = lng_init, lat = lat_init, zoom = zoom_init)
     map
   })
   
@@ -49,17 +58,7 @@ server <- function(input,output, session){
                 layerId="colorLegend")
   })
   
-  # event for clicking the map
-  flightAirport <- eventReactive(
-    eventExpr = input$europeMap_marker_click, 
-    valueExpr = {
-      loc <- input$europeMap_marker_click
-      flights_to_airport <- map_points()[cmpfloat(map_points()$lat, loc$lat),]
-      flights_to_airport <- flights_to_airport[cmpfloat(flights_to_airport$lng, loc$lng),]
-      flights_to_airport
-  })
-  
-  # Create data table of flights to this airport
+  # Create data table of flights to the selected airport
   output$airporttable <- DT::renderDataTable({
     flights_sample <- flightAirport() %>%
       select(tableMap_vars)
@@ -70,7 +69,6 @@ server <- function(input,output, session){
   
   # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
-    s = input$flightstable_rows_current
     ggplot(data = flights_subset(), 
            aes_string(x = input$x, y = input$y, color = input$z, size='price')) +
       geom_point()
@@ -88,10 +86,12 @@ server <- function(input,output, session){
   output$statsFlights <- renderText({
     x_data <- flights_subset() %>% pull(input$x)
     if(is.numeric(x_data)) {
+      # stats for numerical data
       avg_x <-  x_data %>% mean() %>% round(2)
       std_x <- x_data  %>% std() %>% round(2)
       stat_vals <- c("Mean:", avg_x, "Standard deviation:", std_x)
     }else{
+      # stats for non numerical data (Months in this case)
       mod_x <- x_data  %>% getmode() %>% getmonth()
       n_x <-  x_data %>% length()
       stat_vals <- c("Mode:", mod_x, "Number of data points:", n_x)
