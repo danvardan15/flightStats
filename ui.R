@@ -1,26 +1,33 @@
 ui <- fluidPage(
   
-  navbarPage("STATS_change", id="shinyApp",
+  title = 'Flight prices',
+  navbarPage("Departures from Berlin TXL", id="shinyApp",
    # tabPanel for the map
    tabPanel("Map",
             leafletOutput("europeMap",height = 1000),
             
             # Inputs(s)
             absolutePanel(id = "mapControl", class = "panel panel-default",
-                          draggable = TRUE,  top=75, left = 20, right = "auto", bottom = "auto",
+                          draggable = TRUE,  top=170, left = 30, right = "auto", bottom = "auto",
                           width = 330, height = "auto",
                           
                           # Slider Input to filter out price
                           sliderInput(inputId = "priceFilter",
                                       label = "price range",
-                                      min = 0, max = max(flights$price), value = c(0, 100)
+                                      min = 0, max = max(flights$price),
+                                      value = c(min(flights$price), 100)
                           ),
-                          
                           # Select variable for color
-                          selectInput(inputId = "z", 
+                          selectInput(inputId = "mapColor", 
                                       label = "Color by:",
-                                      choices = flightTypes,
-                                      selected = "airline")
+                                      choices = mapColor_vars,
+                                      selected = "airline"),
+                          
+                          # Select variable for size
+                          selectInput(inputId = "mapSize", 
+                                      label = "Size by:",
+                                      choices = mapSize_vars,
+                                      selected = "price")
                           
             )
    ),
@@ -58,7 +65,7 @@ ui <- fluidPage(
     
     # Output(s)
     mainPanel(
-      HTML(paste("<h2>Stats comparison:</h2>")),
+      h2("Departures from TXL"),
       plotOutput(outputId = "scatterplot", brush = "plot_brush"),
       
       h3("Select data points to get information"), br(),

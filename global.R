@@ -34,3 +34,8 @@ airlines <- unique(flights$airline)
 table_vars  <- c('airport', 'airline', 'price', 'month_of_flight', 'year_of_flight')
 table_names <- c('Airport', 'Airline', 'Price €', 'Month of flight', 'Year of flight')
 
+mapSize_vars <- c('on sale' = 'sale', 'price' = 'price')
+mapColor_vars <- c(sizeColor_vars, 'airline' = 'airline', 'country' = 'countryCode')
+
+maxRadius <-  50000
+minRadius <-  5000
