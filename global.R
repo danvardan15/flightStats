@@ -33,20 +33,30 @@ flightFeatures <- c("month of flight" = "month_of_flight",
 flightTypes <- c("country" = "countryCode", "airline" = "airline", 
                  "on sale" = "sale", "year of flight" = "year_of_flight")
 
+table_vars  <- c("airport", "airline", "price", "date_of_flight")
+table_names <- c("Airport", "Airline", "Price €", "Date of flight")
+
+
+mapColor_vars <- c("months in advance" = "months_in_advance", "price" = "price",
+                   "airline" = "airline", "country" = "countryCode")
+
+features_to_filter <- c("airline", "year of flight" = "year_of_flight")
+
 airlines <- unique(flights$airline)
+yearsFlight <- unique(flights$year_of_flight)
 
-table_vars  <- c('airport', 'airline', 'price', 'date_of_flight')
-table_names <- c('Airport', 'Airline', 'Price €', 'Date of flight')
-
-mapColor_vars <- c('price' = 'price', 'airline' = 'airline', 'country' = 'countryCode')
-
+# Constant
 maxRadius <-  50000
 
+# Useful functions
+
+# mode of numerical or categorical
 getmode <- function(v) {
   uniqv <- unique(v)
   uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
+# function to get month character from number
 getmonth <- function(n) {
   month.abb[n]
 }

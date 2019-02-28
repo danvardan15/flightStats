@@ -49,13 +49,25 @@ ui <- fluidPage(
                     label = "Color by:",
                     choices = flightTypes,
                     selected = "airline"),
-        
-        # Select which airlines to plot
-        checkboxGroupInput(inputId = "selected_type",
-                   label = "Select airline(s):",
-                   choices = airlines,
-                   selected = airlines),
-        # Regression output
+        # Select depending on airline or year
+        selectInput(inputId = "filterFeature",
+                    label = "Filter by feature:",
+                    choices = features_to_filter),
+        conditionalPanel(
+                    condition = "input.filterFeature == 'airline'",
+                    checkboxGroupInput(inputId = "selected_airline",
+                                       label = "Select:",
+                                       choices = airlines,
+                                       selected = airlines)
+        ),
+        conditionalPanel(
+          condition = "input.filterFeature == 'year_of_flight'",
+          checkboxGroupInput(inputId = "selected_year",
+                             label = "Select:",
+                             choices = yearsFlight,
+                             selected = yearsFlight)
+        ),
+        # Statistics output
         verbatimTextOutput(outputId = "statsFlights") 
       ),
     
