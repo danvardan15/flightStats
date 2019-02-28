@@ -5,7 +5,7 @@ library(ggplot2)
 library(tools)
 library(DT)
 
-flights <- read.csv("/home/danielv/Documents/bccn/R_tut/flight_app/sample.csv",
+flights <- read.csv("sample.csv",
                     header = TRUE, stringsAsFactors = FALSE)
 
 #dates from number to string
@@ -58,7 +58,6 @@ tol = 1e-4
 cmpfloat <- function(x, y) {
   abs(x - y) <= tol
 }
-abs(flights$lat - cx) <= tol
 
 # mode of numerical or categorical
 getmode <- function(v) {
