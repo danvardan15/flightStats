@@ -8,18 +8,25 @@ server <- function(input,output, session){
       filter(flights, airline %in% input$selected_type)
   })
   
-  # Calculate statistics
-  output$corrcoef <- renderUI({
-    r <- round(cor(flights_subset()[, input$x],
-                   as.double(flights_subset()[, input$y]), use = "pairwise"), 3
-               )
-    HTML(
-        paste(input$x, "v. ", input$y),
-        "\t",
-        paste("<br>Correlation coefficient: ", input$y, "=", r),
-        paste("<h6> Valid for linear dependencies </h6>")
-        )
+  # Subset of data filtered by airline
+  map_points <- reactive({
+    priceFilter <- input$priceFilter
+    req(priceFilter)
+    filter(flights, price %in% (priceFilter[1]:priceFilter[2]))
   })
+  
+  # render Map
+  output$europeMap <- renderLeaflet({
+    map <- leaflet(data = map_points()) %>%
+      #addProviderTiles("Esri.WorldImagery") %>%
+      addProviderTiles("Stamen.Toner") %>%
+      setView(lng = 3, lat = 42, zoom = 3.5) %>%
+      addCircles(lng = ~ lng, lat= ~ lat, popup = ~ paste(as.character(price), '€'))
+    map
+  })
+  
+  # Calculate statistics
+  # todo
   
   # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
@@ -29,30 +36,12 @@ server <- function(input,output, session){
       geom_point()
   })
   
-  # Create  density object the plotOutput function is expecting
-  output$densityplot <- renderPlot({
-    ggplot(data = flights_subset(), 
-           aes_string(x = input$x)) +
-      geom_bar()
-  })
-  
   # Create data table
   output$flightstable <- DT::renderDataTable({
     flights_sample <- brushedPoints(flights_subset(), brush = input$plot_brush) %>%
     select(table_vars)
     DT::datatable(data = flights_sample,
-                  rownames = FALSE)
+                  colnames = table_names)
   })
-  
-  # render Map
-  output$europeMap <- renderLeaflet({
-    map <- leaflet(data = flights_subset()) %>%
-      #addProviderTiles("Esri.WorldImagery") %>%
-      addProviderTiles("Stamen.Toner") %>%
-      setView(lng = 5, lat = 42, zoom = 5) %>%
-      addCircles(lng = ~ lng, lat= ~ lat, popup = ~ paste(as.character(price), '€'))
-    map
-  })
-  
 
 }

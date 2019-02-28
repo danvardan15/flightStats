@@ -1,7 +1,30 @@
 ui <- fluidPage(
   
   navbarPage("STATS_change", id="shinyApp",
-   # Sidebar layout with a input and output definitions
+   # tabPanel for the map
+   tabPanel("Map",
+            leafletOutput("europeMap",height = 1000),
+            
+            # Inputs(s)
+            absolutePanel(id = "mapControl", class = "panel panel-default",
+                          draggable = TRUE,  top=75, left = 20, right = "auto", bottom = "auto",
+                          width = 330, height = "auto",
+                          
+                          # Slider Input to filter out price
+                          sliderInput(inputId = "priceFilter",
+                                      label = "price range",
+                                      min = 0, max = max(flights$price), value = c(0, 100)
+                          ),
+                          
+                          # Select variable for color
+                          selectInput(inputId = "z", 
+                                      label = "Color by:",
+                                      choices = flightTypes,
+                                      selected = "airline")
+                          
+            )
+   ),
+   # tabPanel for data visualization and statistics
    tabPanel("Flights data",
      
       # Inputs(s)
@@ -30,23 +53,17 @@ ui <- fluidPage(
         checkboxGroupInput(inputId = "selected_type",
                    label = "Select airline(s):",
                    choices = airlines,
-                   selected = airlines),
-        
-        dataTableOutput(outputId = "flightstable")
-                    
+                   selected = airlines)
       ),
     
     # Output(s)
     mainPanel(
       HTML(paste("<h2>Stats comparison:</h2>")),
-      #htmlOutput(outputId = "corrcoef"),
       plotOutput(outputId = "scatterplot", brush = "plot_brush"),
-      br(),
-      plotOutput(outputId = "densityplot")
+      
+      h3("Select data points to get information"), br(),
+      dataTableOutput(outputId = "flightstable")
     )
-   ),
-   tabPanel("Map",
-     leafletOutput("europeMap",height = 1000)
    )
   )
 )
